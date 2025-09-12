@@ -63,15 +63,6 @@ _start:
     mov dword [grid_var+Grid_var.grid_size], eax
 
 
-    ;mov rdx, rax
-    ;mov rax, 1
-    ;mov rdi, 1
-    ;mov rsi, current_grid
-    ;syscall
-
-
-
-
 
     mov r12d, dword [grid_var+Grid_var.epz_size]
     xor rcx, rcx        ; 루프 카운터
@@ -110,8 +101,7 @@ _start:
     sub r9b, 0x30
 
     ; 논리 인덱스 계산
-    mov rax, r12
-    add rax, 2
+    mov eax, dword [grid_var+Grid_var.map_size]
     imul rax, r8
     add rax, r10
     
@@ -150,6 +140,31 @@ _start:
     mov edx, dword [grid_var+Grid_var.grid_size]
     syscall
 
+    ; 최초 1회 다음 그리드에 현재 그리드 복사
+    mov rdi, qword [grid_var+Grid_var.next_grid]
+    mov rsi, qword [grid_var+Grid_var.current_grid]
+    mov ecx, dword [grid_var+Grid_var.grid_size]
+    rep movsb
+
+    mov rdi, qword [grid_var+Grid_var.current_grid]
+    mov rsi, qword [grid_var+Grid_var.next_grid]
+    call to_next_grid
+
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, qword [grid_var+Grid_var.current_grid]
+    mov edx, dword [grid_var+Grid_var.grid_size]
+    syscall
+
+    mov rdi, qword [grid_var+Grid_var.current_grid]
+    mov rsi, qword [grid_var+Grid_var.next_grid]
+    call to_next_grid
+
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, qword [grid_var+Grid_var.current_grid]
+    mov edx, dword [grid_var+Grid_var.grid_size]
+    syscall
 
     mov rdi, qword [grid_var+Grid_var.current_grid]
     mov rsi, qword [grid_var+Grid_var.next_grid]

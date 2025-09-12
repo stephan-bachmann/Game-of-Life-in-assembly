@@ -9,6 +9,7 @@ global to_next_grid
 extern CHARS
 extern grid_var
 
+
 ; 행과 열을 주면 논리 인덱스를 반환하는 함수
 ; 변경하는 레지스터: rax
 ; input:
@@ -142,7 +143,7 @@ grid_set:
 .is_left_or_right:
     cmp rdx, 0
     je .it_is_left
-    cmp r12, r8
+    cmp rdx, r8
     je .it_is_right
     jmp .set_character
 .it_is_left:
@@ -232,13 +233,9 @@ grid_set:
 
 .ret:
     mov rax, r13
-    xor rdx, rdx    ; 열
-    div r12
-    mov rcx, rax    ; 행
-
-    mov rax, r13
     imul rax, 3
     add rax, r15
+    inc rax         ; 마지막 줄바꿈 포함
 
     pop r15
     pop r14
@@ -317,31 +314,6 @@ get_logic_index_value:
 
 
 
-
-
-; 그리드 주소, 논리 인덱스, 플래그를 주면 실제 인덱스를 해당 플래그의 값으로 변경하는 함수
-; 변경하는 레지스터: rcx
-; input:
-;   rdi = 그리드 주소
-;   rsi = 논리 인덱스
-;   rdx = 플래그
-flag_to_index_value:
-    cmp rdx, 1
-    jg .not_space_or_square
-
-    call insert_char_to_index
-
-.not_space_or_square:
-
-.ret:
-    ret
-
-;
-
-
-
-
-
 ; 그리드 주소와 기준 행렬을 받아 주변 8칸을 검사하고 살아 있는 세포 수를 반환하는 함수
 ; 변경하는 레지스터: rax, rsi, rdx, r8, r9, r10, r11
 ; input:
@@ -384,14 +356,18 @@ check_neighbor:
 
 .not_self:
     ; 상대 논리 인덱스 계산
-    mov rax, r13
-    add rax, r10
-    imul rax, r12
-    add rax, r14
-    add rax, r11
+    push rdi
+    mov rdi, r13
+    add rdi, r10
+    mov rsi, r14
+    add rsi, r11
+    call row_and_column_to_logic_index
+    pop rdi
 
     mov rsi, rax
+    push rdx
     call get_logic_index_value
+    pop rdx
 
     cmp rax, 1
     jne .next_column
@@ -414,9 +390,9 @@ check_neighbor:
     pop r14
     pop r13
     pop r12
+    pop rbp
     ret
 
-    pop rbp
 ;
 
 
@@ -433,7 +409,9 @@ to_next_grid:
     push r12
     push r13
     push r14
-    sub rsp, 8
+    push r15
+
+
 
     mov rcx, 1                  ; 행
     xor r12, r12                ; 존재 가능 구역 크기
@@ -442,33 +420,37 @@ to_next_grid:
     xor r9, r9                  ; 현재 인덱스 주변에 살아 있는 세포 수
     xor r10, r10                ; 다음 세대에 살아 있는 세포 수
     xor r11, r11                ; 현재 논리 인덱스
+    mov r13, rdi
+    mov r14, rsi
 .EPZ_row_loop:
     mov rdx, 1  ; 열
 .EPZ_column_loop:
-    mov r13, rdi
-    mov r14, rsi
     mov rdi, rcx    ; 행 전달
     mov rsi, rdx    ; 열 전달
     call row_and_column_to_logic_index
     mov r11, rax    ; 논리 인덱스
 
+    push rdx
     mov rdi, r13
     mov rsi, r11
     call get_logic_index_value
     mov r8, rax
+    pop rdx
 
-
+    mov r15, rdx
+    
+    push r8
     push r10
     push r11
     mov rsi, rcx
     call check_neighbor
     pop r11
     pop r10
+    pop r8
     mov rsi, r14
 
     mov r9, rax
 
-    mov r15, rdx
 
     cmp r8, 0
     je .dead
@@ -483,12 +465,14 @@ to_next_grid:
     jmp .next_cell
 
 .die:
+    push rcx
     mov rdi, rsi
     mov rsi, r11
     xor rdx, rdx
-    call flag_to_index_value
+    call insert_char_to_index
     mov rdi, r13
     mov rdx, r15
+    pop rcx
 
 
 .dead:
@@ -496,12 +480,14 @@ to_next_grid:
     jne .next_cell
 
 .live:
+    push rcx
     mov rdi, rsi
     mov rsi, r11
-    xor rdx, 1
-    call flag_to_index_value
+    mov rdx, 1
+    call insert_char_to_index
     mov rdi, r13
     mov rdx, r15
+    pop rcx
 
     inc r10
 
@@ -516,6 +502,8 @@ to_next_grid:
 
     
     ; 다음 상태를 현재 상태로 복사
+    mov rdi, qword [grid_var+Grid_var.current_grid]
+    mov rsi, qword [grid_var+Grid_var.next_grid]
     mov ecx, dword [grid_var+Grid_var.grid_size]
     rep movsb
 
