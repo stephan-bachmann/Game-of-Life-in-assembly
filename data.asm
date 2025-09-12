@@ -1,4 +1,3 @@
-default rel
 %include "structs.inc"
 
 global guide, guide_len
