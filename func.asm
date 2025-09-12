@@ -11,7 +11,6 @@ extern grid_var
 
 
 ; 행과 열을 주면 논리 인덱스를 반환하는 함수
-; 변경하는 레지스터: rax
 ; input:
 ;   rdi = 행
 ;   rsi = 열
@@ -34,7 +33,6 @@ row_and_column_to_logic_index:
 
 
 ; 논리 인덱스를 주면 실제 인덱스를 반환하는 함수
-; 변경하는 레지스터: rdi, rax, rcx, rdx
 ; input:
 ;   rdi = 논리 인덱스
 ; return:
@@ -61,7 +59,6 @@ logical_index_to_real_index:
 
 
 ; 그리드 주소, 논리 인덱스, 문자 인덱스를 주면 해당 문자를 써주는 함수
-; 변경하는 레지스터: rdi, rsi, rcx
 ; input:
 ;   rdi = 그리드 주소
 ;   rsi = 논리 인덱스
@@ -99,7 +96,6 @@ insert_char_to_index:
 
 
 ; 그리드의 틀을 채우는 함수
-; 변경하는 레지스터: rsi, rax, rcx, rdx, r8, r9, r10, r11
 ; input:
 ;   rdi = 그리드 주소
 ; return:
@@ -252,7 +248,6 @@ grid_set:
 
 
 ; 그리드 주소와 논리 인덱스를 주면 실제 인덱스 값을 플래그로 반환하는 함수
-; 변경하는 레지스터: rax, rdx, r8, r9
 ; input:
 ;   rdi = 그리드 주소
 ;   rsi = 논리 인덱스
@@ -315,7 +310,6 @@ get_logic_index_value:
 
 
 ; 그리드 주소와 기준 행렬을 받아 주변 8칸을 검사하고 살아 있는 세포 수를 반환하는 함수
-; 변경하는 레지스터: rax, rsi, rdx, r8, r9, r10, r11
 ; input:
 ;   rdi = 그리드 주소
 ;   rsi = 기준 행
@@ -397,7 +391,6 @@ check_neighbor:
 
 
 ; 현재 그리드와 다음 그리드의 주소를 주면 현재를 기반으로 다음 세대의 그리드를 그리는 함수
-; 변경하는 레지스터: rax, rcx, rdx, r8, r9, r10, r11
 ; input:
 ;   rdi = 현재 그리드 주소
 ;   rsi = 다음 그리드 주소
