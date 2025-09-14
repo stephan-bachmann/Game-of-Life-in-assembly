@@ -14,7 +14,7 @@ extern current_grid, next_grid
 extern grid_var
 extern insert_char_to_index
 extern grid_set
-extern atoi
+extern atoi, sleep
 extern to_next_grid
 
 section .text
@@ -127,7 +127,9 @@ _start:
 
 
     ; 사용자에게 입력 받기
-    
+
+
+
     mov rax, 1
     mov rdi, 1
     mov rsi, clear
@@ -140,20 +142,29 @@ _start:
     mov edx, dword [grid_var+Grid_var.grid_size]
     syscall
 
+
+    mov rdi, 1
+    xor rsi, rsi
+    call sleep
+
+    
     ; 최초 1회 다음 그리드에 현재 그리드 복사
     mov rdi, qword [grid_var+Grid_var.next_grid]
     mov rsi, qword [grid_var+Grid_var.current_grid]
     mov ecx, dword [grid_var+Grid_var.grid_size]
     rep movsb
 
-    mov rdi, qword [grid_var+Grid_var.current_grid]
-    mov rsi, qword [grid_var+Grid_var.next_grid]
-    call to_next_grid
+
+
+.infinity_loop:
+    xor rdi, rdi
+    mov rsi, 500
+    call sleep
 
     mov rax, 1
     mov rdi, 1
-    mov rsi, qword [grid_var+Grid_var.current_grid]
-    mov edx, dword [grid_var+Grid_var.grid_size]
+    mov rsi, clear
+    mov rdx, clear_len
     syscall
 
     mov rdi, qword [grid_var+Grid_var.current_grid]
@@ -166,15 +177,7 @@ _start:
     mov edx, dword [grid_var+Grid_var.grid_size]
     syscall
 
-    mov rdi, qword [grid_var+Grid_var.current_grid]
-    mov rsi, qword [grid_var+Grid_var.next_grid]
-    call to_next_grid
-
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, qword [grid_var+Grid_var.current_grid]
-    mov edx, dword [grid_var+Grid_var.grid_size]
-    syscall
+    jmp .infinity_loop
 
 
     jmp _exit
