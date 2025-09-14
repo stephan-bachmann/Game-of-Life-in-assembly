@@ -1,12 +1,11 @@
 default rel
 %include "structs.inc"
 
-global sleep, atoi, itoa
+global sleep, atoi, itoa, insert_line_feed
 
 section .text
 
 ; 지연 함수
-; 변경하는 레지스터: rax, rdi, rsi, rdx
 ; input:
 ;   rdi = 초 단위
 ;   rsi = 밀리초 단위 (0~999)
@@ -38,7 +37,6 @@ sleep:
 
 
 ; 숫자 문자열을 정수로 바꿔주는 함수
-; 변경하는 레지스터: rax
 ; input:
 ;   rdi = 변환할 문자열 주소
 ; reuturn:
@@ -149,3 +147,18 @@ itoa:
     ret
 
 ;
+
+
+
+
+
+; input:
+;   rdi = 쓸 버퍼의 초기 주소
+;   rsi = 사용된 버퍼 길이
+; return: 
+;   rax = 사용된 버퍼 길이 + 1
+insert_line_feed:
+    mov byte [rdi+rsi], 0xa
+    mov rax, rsi
+    inc rax
+    ret

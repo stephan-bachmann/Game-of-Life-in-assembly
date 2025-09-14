@@ -7,7 +7,11 @@ global clear, clear_len
 global CHARS
 global input_N, input_map
 global current_grid, next_grid
+global generation_print, generation_print_len
+global survived_cell_count, survived_cell_count_len
+global max_cell_count, max_cell_count_len
 global grid_var
+global write_buffer
 
 section .rodata
     guide: db "input map size: "
@@ -24,6 +28,17 @@ section .rodata
     
     clear: db 0x1b, '[2J', 0x1b, '[H'
     clear_len: equ $ - clear
+
+    
+    generation_print: db "Generation: "
+    generation_print_len: equ $ - generation_print
+
+
+    survived_cell_count: db "Cells: "
+    survived_cell_count_len: equ $ - survived_cell_count
+
+    max_cell_count: db "Max cells: "
+    max_cell_count_len: equ $ - max_cell_count
 
 
     SPACE: db 0xe2, 0x80, 0x82
@@ -50,3 +65,6 @@ section .bss
     next_grid: resb 8427
 
     grid_var: resb Grid_var_size
+
+    write_buffer: resb 0x30
+

@@ -6,8 +6,15 @@ default rel
 global grid_set
 global insert_char_to_index
 global to_next_grid
+global print_information
 extern CHARS
 extern grid_var
+extern generation_print, generation_print_len
+extern survived_cell_count, survived_cell_count_len
+extern max_cell_count, max_cell_count_len
+extern write_buffer
+extern insert_line_feed
+extern itoa
 
 
 ; 행과 열을 주면 논리 인덱스를 반환하는 함수
@@ -513,3 +520,73 @@ to_next_grid:
 
  
 ;
+
+
+; 문자열 번호와 붙일 수를 주면 출력하고 버퍼 정리까지 하는 함수
+; input: 
+;   rdi = 문자열 번호(0 = generation, 1 = survived, 2 = max)
+;   rsi = 뒤에 붙일 수
+print_information:
+    push rsi
+    
+    cmp rdi, 0
+    je .generation
+
+    cmp rdi, 1
+    je .survived
+
+    jmp .max
+
+
+.generation:
+    mov rsi, generation_print
+    mov rdx, generation_print_len
+
+    jmp .next
+
+
+.survived:
+    mov rsi, survived_cell_count
+    mov rdx, survived_cell_count_len
+
+    jmp .next
+
+.max:
+    mov rsi, max_cell_count
+    mov rdx, max_cell_count_len
+
+.next:
+    mov rdi, write_buffer
+    mov rcx, rdx
+    rep movsb
+
+    pop rsi
+    push rdi
+    mov rdi, rsi
+    pop rsi
+    push rdx
+    call itoa
+    pop rdx
+
+    add rdx, rax
+
+    mov rdi, write_buffer
+    mov rsi, rdx
+    call insert_line_feed
+
+    mov rdi, write_buffer
+    mov rsi, rax
+    call insert_line_feed
+
+    mov rdx, rax
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, write_buffer
+    syscall
+
+    mov rdi, write_buffer
+    mov rcx, 0x30
+    xor rax, rax
+    rep stosb
+
+    ret

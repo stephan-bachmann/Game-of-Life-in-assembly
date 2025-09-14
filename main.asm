@@ -16,6 +16,7 @@ extern insert_char_to_index
 extern grid_set
 extern atoi, sleep
 extern to_next_grid
+extern print_information
 
 section .text
 _start:
@@ -143,6 +144,21 @@ _start:
     syscall
 
 
+    mov r12, 1
+    xor r13, r13
+
+    mov rdi, 0
+    mov rsi, r12
+    call print_information
+    
+    mov rdi, 1
+    mov rsi, 0
+    call print_information
+
+    mov rdi, 2
+    mov rsi, r13
+    call print_information
+
     mov rdi, 1
     xor rsi, rsi
     call sleep
@@ -155,11 +171,7 @@ _start:
     rep movsb
 
 
-
 .infinity_loop:
-    xor rdi, rdi
-    mov rsi, 500
-    call sleep
 
     mov rax, 1
     mov rdi, 1
@@ -170,6 +182,7 @@ _start:
     mov rdi, qword [grid_var+Grid_var.current_grid]
     mov rsi, qword [grid_var+Grid_var.next_grid]
     call to_next_grid
+    mov r8, rax
 
     mov rax, 1
     mov rdi, 1
@@ -177,11 +190,35 @@ _start:
     mov edx, dword [grid_var+Grid_var.grid_size]
     syscall
 
+    inc r12
+    
+    mov rdi, 0
+    mov rsi, r12
+    call print_information
+
+    mov rdi, 1
+    mov rsi, r8
+    call print_information
+
+    cmp r8, r13
+    jle .no_greater
+    mov r13, r8
+    
+.no_greater:
+    mov rdi, 2
+    mov rsi, r13
+    call print_information
+
+
+
+    mov rdi, 0
+    mov rsi, 700
+    call sleep
+
+    cmp r8, 0
+    je _exit
+
     jmp .infinity_loop
-
-
-    jmp _exit
-
 
 
 
@@ -199,3 +236,4 @@ _exit:
     mov rax, 60
     xor rdi, rdi
     syscall
+
