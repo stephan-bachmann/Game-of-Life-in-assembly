@@ -66,17 +66,15 @@ _start:
 
 
     mov r12d, dword [grid_var+Grid_var.epz_size]
-    xor rcx, rcx        ; 루프 카운터
+    xor r13, r13        ; 루프 카운터
     mov r8, 1           ; 행
     ; 사용자에게 입력 받기
 .input_loop:
-    push rcx
     xor rax, rax
     xor rdi, rdi
     mov rsi, input_map
     mov rdx, r12
     syscall
-    pop rcx
 
     cmp rax, r12
     je .continue
@@ -91,7 +89,6 @@ _start:
     jmp .input_loop
 
 .continue:
-    push rcx
     xor rcx, rcx
     xor r9, r9
     xor r10, r10
@@ -116,14 +113,13 @@ _start:
     inc rcx
     cmp rcx, r12
     jne .insert_loop
-    pop rcx
 
 
 
 
-    inc rcx
+    inc r13
     inc r8
-    cmp rcx, r12
+    cmp r13, r12
     jne .input_loop
 
 
