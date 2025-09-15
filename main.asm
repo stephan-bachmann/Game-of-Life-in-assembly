@@ -182,7 +182,7 @@ _start:
     mov rdi, qword [grid_var+Grid_var.current_grid]
     mov rsi, qword [grid_var+Grid_var.next_grid]
     call to_next_grid
-    mov r8, rax
+    mov r14, rax
 
     mov rax, 1
     mov rdi, 1
@@ -197,12 +197,12 @@ _start:
     call print_information
 
     mov rdi, 1
-    mov rsi, r8
+    mov rsi, r14
     call print_information
 
-    cmp r8, r13
+    cmp r14, r13
     jle .no_greater
-    mov r13, r8
+    mov r13, r14
     
 .no_greater:
     mov rdi, 2
@@ -215,7 +215,7 @@ _start:
     mov rsi, 700
     call sleep
 
-    cmp r8, 0
+    cmp r14, 0
     je _exit
 
     jmp .infinity_loop

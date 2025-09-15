@@ -527,7 +527,7 @@ to_next_grid:
 ;   rdi = 문자열 번호(0 = generation, 1 = survived, 2 = max)
 ;   rsi = 뒤에 붙일 수
 print_information:
-    push rsi
+    mov r8, rsi
     
     cmp rdi, 0
     je .generation
@@ -560,10 +560,8 @@ print_information:
     mov rcx, rdx
     rep movsb
 
-    pop rsi
-    push rdi
-    mov rdi, rsi
-    pop rsi
+    mov rsi, rdi
+    mov rdi, r8
     push rdx
     call itoa
     pop rdx
