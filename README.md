@@ -6,4 +6,4 @@
 - 이전 실행 파일과 오브젝트 파일을 제거하려면 make clean
 
 # 시연
-https://youtu.be/SO1bPI-6BMY
+- https://youtu.be/SO1bPI-6BMY
